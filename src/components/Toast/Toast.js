@@ -36,14 +36,14 @@ function Toast({ toastObj: { message, variantSelected, id, aliveTime = 0 } }) {
         const newToasts = prev.filter((toast) => toast.id !== id);
         return newToasts;
       });
-    }, 800);
+    }, 500);
   }, [setToasts, id]);
 
   useEffect(() => {
     if (aliveTime > 0) {
       const timeout = setTimeout(() => {
         closeToast();
-      }, aliveTime);
+      }, aliveTime + 800);
 
       return () => clearTimeout(timeout);
     }
