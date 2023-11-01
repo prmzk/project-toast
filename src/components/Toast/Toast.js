@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useCallback, useContext, useEffect } from "react";
 import {
   AlertOctagon,
   AlertTriangle,
   CheckCircle,
   Info,
   X,
-} from 'react-feather';
+} from "react-feather";
 
-import VisuallyHidden from '../VisuallyHidden';
+import VisuallyHidden from "../VisuallyHidden";
 
-import styles from './Toast.module.css';
+import { ToastContext } from "../ToastProvider/ToastProvider";
+import styles from "./Toast.module.css";
 
 const ICONS_BY_VARIANT = {
   notice: Info,
@@ -18,16 +19,52 @@ const ICONS_BY_VARIANT = {
   error: AlertOctagon,
 };
 
-function Toast() {
+function Toast({ toastObj: { message, variantSelected, id, aliveTime = 0 } }) {
+  const { setToasts } = useContext(ToastContext);
+  const Icon = variantSelected ? ICONS_BY_VARIANT[variantSelected] : Info;
+
+  const closeToast = useCallback(() => {
+    setToasts((prev) => {
+      const index = prev.map((toast) => toast.id).indexOf(id);
+      const newToasts = [...prev];
+      newToasts[index]["willClose"] = true;
+      return newToasts;
+    });
+
+    setTimeout(() => {
+      setToasts((prev) => {
+        const newToasts = prev.filter((toast) => toast.id !== id);
+        return newToasts;
+      });
+    }, 800);
+  }, [setToasts, id]);
+
+  useEffect(() => {
+    if (aliveTime > 0) {
+      const timeout = setTimeout(() => {
+        closeToast();
+      }, aliveTime);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [aliveTime, closeToast]);
+
   return (
-    <div className={`${styles.toast} ${styles.notice}`}>
+    <div
+      id={id}
+      className={`${styles.toast} ${styles.notice} ${styles[variantSelected]}`}
+    >
       <div className={styles.iconContainer}>
-        <Info size={24} />
+        <VisuallyHidden>{variantSelected}</VisuallyHidden>
+        <Icon size={24} />
       </div>
-      <p className={styles.content}>
-        16 photos have been uploaded
-      </p>
-      <button className={styles.closeButton}>
+      <p className={styles.content}>{message}</p>
+      <button
+        className={styles.closeButton}
+        onClick={closeToast}
+        aria-label="Dismiss message"
+        aria-live="off"
+      >
         <X size={24} />
         <VisuallyHidden>Dismiss message</VisuallyHidden>
       </button>
