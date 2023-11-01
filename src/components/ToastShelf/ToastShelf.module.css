@@ -6,7 +6,8 @@
 
 @keyframes toastExit {
   to {
-    transform: translateX(calc(100% + 64px));
+    transform: translateX(calc(100%));
+    display: none;
   }
 }
 
@@ -27,6 +28,6 @@
 }
 
 .toastWrapperClosing {
-  animation: toastExit 800ms cubic-bezier(0, 0.46, 0, 1.04) both;
+  animation: toastExit 800ms cubic-bezier(0.11, 0, 0.8, 0.37) forwards;
   will-change: transform;
 }
