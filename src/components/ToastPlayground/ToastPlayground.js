@@ -11,11 +11,16 @@ function ToastPlayground() {
   const toast = useToast();
   const [variantSelected, setVariantSelected] = useState("notice");
   const [message, setMessage] = useState("");
-  const [aliveTime, setAliveTime] = useState(1000);
+  const [aliveTime, setAliveTime] = useState(1);
 
   const handleToastSubmit = (e) => {
     e.preventDefault();
-    toast({ message, variantSelected, id: crypto.randomUUID(), aliveTime });
+    toast({
+      message,
+      variantSelected,
+      id: crypto.randomUUID(),
+      aliveTime: aliveTime * 1000,
+    });
     setMessage("");
   };
 
@@ -56,7 +61,7 @@ function ToastPlayground() {
               className={styles.label}
               style={{ alignSelf: "baseline" }}
             >
-              Alive Time
+              Alive Time (second)
             </label>
             <div className={styles.inputWrapper}>
               <input

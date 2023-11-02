@@ -16,16 +16,14 @@ function ToastShelf() {
       aria-live="polite"
       aria-label="Notification"
     >
-      {toasts.map((toastObj) => (
+      {toasts.map((toast) => (
         <li
-          key={toastObj.id}
+          key={toast.id}
           className={
-            toastObj.willClose
-              ? styles.toastWrapperClosing
-              : styles.toastWrapper
+            toast.willClose ? styles.toastWrapperClosing : styles.toastWrapper
           }
         >
-          <Toast toastObj={toastObj} />
+          <Toast toastProp={toast} />
         </li>
       ))}
     </ol>

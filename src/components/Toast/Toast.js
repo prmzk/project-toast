@@ -1,49 +1,42 @@
 import React, { useCallback, useContext, useEffect } from "react";
-import {
-  AlertOctagon,
-  AlertTriangle,
-  CheckCircle,
-  Info,
-  X,
-} from "react-feather";
+import { X } from "react-feather";
 
 import VisuallyHidden from "../VisuallyHidden";
 
 import { ToastContext } from "../ToastProvider/ToastProvider";
 import styles from "./Toast.module.css";
+import ToastIcon from "./ToastIcon";
 
-const ICONS_BY_VARIANT = {
-  notice: Info,
-  warning: AlertTriangle,
-  success: CheckCircle,
-  error: AlertOctagon,
-};
+const TOAST_EXIT_ANIMATION_DURATION = 500;
+const TOAST_ENTER_ANIMATION_DURATION = 800;
 
-function Toast({ toastObj: { message, variantSelected, id, aliveTime = 0 } }) {
+function Toast({ toastProp: { message, variantSelected, id, aliveTime = 0 } }) {
   const { setToasts } = useContext(ToastContext);
-  const Icon = variantSelected ? ICONS_BY_VARIANT[variantSelected] : Info;
 
   const closeToast = useCallback(() => {
+    // Toggle a willClose property on the toast to trigger the exit animation
     setToasts((prev) => {
-      const index = prev.map((toast) => toast.id).indexOf(id);
       const newToasts = [...prev];
+      const index = newToasts.map((toast) => toast.id).indexOf(id);
       newToasts[index]["willClose"] = true;
       return newToasts;
     });
 
+    // Remove the toast when the exit animation is finished
     setTimeout(() => {
       setToasts((prev) => {
         const newToasts = prev.filter((toast) => toast.id !== id);
         return newToasts;
       });
-    }, 500);
+    }, TOAST_EXIT_ANIMATION_DURATION);
   }, [setToasts, id]);
 
   useEffect(() => {
+    // Close toast after "aliveTime" amount of time
     if (aliveTime > 0) {
       const timeout = setTimeout(() => {
         closeToast();
-      }, aliveTime + 800);
+      }, aliveTime + TOAST_ENTER_ANIMATION_DURATION);
 
       return () => clearTimeout(timeout);
     }
@@ -56,7 +49,7 @@ function Toast({ toastObj: { message, variantSelected, id, aliveTime = 0 } }) {
     >
       <div className={styles.iconContainer}>
         <VisuallyHidden>{variantSelected}</VisuallyHidden>
-        <Icon size={24} />
+        <ToastIcon variantSelected={variantSelected} size={24} />
       </div>
       <p className={styles.content}>{message}</p>
       <button
